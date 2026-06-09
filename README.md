@@ -1,7 +1,6 @@
 # jmcomic-plugin
 
-禁漫天堂（JMComic）搜索、下载、PDF 导出，以及 QQ 群 `#车牌` 指令。基于 [JMComic-Crawler-Python](https://github.com/hect0x7/JMComic-Crawler-Python)，实现思路参考 [sunflowermm/jmcomic](https://github.com/sunflowermm/jmcomic)。
-
+禁漫天堂（JMComic）搜索、下载、PDF 导出，以及 QQ 群 `#车牌` 指令。基于 [JMComic-Crawler-Python](https://github.com/hect0x7/JMComic-Crawler-Python)。
 **插件名：** `jmcomic` · **版本：** 1.1.0 · **类型：** 能力插件（HTTP + Agent 工具 + OneBot 指令，非消息桥接）
 
 ---
@@ -32,91 +31,7 @@
 | OneBot 扩展 | `register_onebot_command_handler`（`ly_next.messaging.onebot_commands`） |
 | Telegram 扩展 | `register_telegram_command_handler`（`ly_next.messaging.telegram_commands`） |
 
-安装目录：`plugins/local/jmcomic_plugin/`（已在根 `.gitignore` 中，不随 core 提交）。
-
----
-
-## 架构
-
-```mermaid
-flowchart TB
-  subgraph clients["接入"]
-    WB[工作台 / Agent]
-    QQ[QQ 群 · 私聊]
-    CURL[curl / 外部 HTTP]
-  end
-
-  subgraph ly["LY-NEXT core"]
-    PL[PluginLoader]
-    TR[Tool Registry]
-    API[API Registry\n/api/jmcomic]
-    OBC[OneBot Command 分发\nonebot_commands.py]
-    OB[qq-onebot 桥接]
-  end
-
-  subgraph plugin["jmcomic_plugin"]
-    SVC[service.py\nsearch · download · PDF]
-    TOOLS[tools.py]
-    HTTP[api.py]
-    CP[qq_chepai.py\n#车牌]
-    CFG[config.py\n合并配置]
-  end
-
-  subgraph storage["本地存储"]
-    DL[data/jmcomic/download]
-    PDF[data/jmcomic/pdf]
-    MEDIA[data/media/jmcomic]
-    YML[data/jmcomic/config.yaml]
-  end
-
-  subgraph external["外部"]
-    JM[jmcomic 库\nAPP/HTML 客户端]
-  end
-
-  PL --> plugin
-  WB --> TR
-  WB --> API
-  CURL --> API
-  QQ --> OB --> OBC --> CP
-  TR --> TOOLS --> SVC
-  API --> SVC
-  CP --> SVC
-  CFG --> YML
-  SVC --> DL
-  SVC --> PDF
-  CP --> MEDIA
-  SVC --> JM
-```
-
-### `#车牌` 投递顺序
-
-```mermaid
-sequenceDiagram
-  participant U as 用户
-  participant OB as qq-onebot
-  participant CP as qq_chepai
-  participant S as service
-  participant M as /media
-
-  U->>OB: #车牌123456
-  OB->>CP: command handler (priority 50)
-  CP->>U: 正在处理…
-  CP->>S: download_album_sync
-  alt 已有 PDF 且 reuse_existing_pdf
-    S-->>CP: cached pdf_path
-  else 下载并导出
-    S->>S: download + export_pdf
-  end
-  CP->>U: ① segment.file 发 PDF
-  alt 失败且为群聊
-    CP->>U: ② upload_group_file
-  end
-  alt 仍失败
-    CP->>M: 复制到 data/media/jmcomic/
-    CP->>U: ③ 直链 public_base_url/media/jmcomic/…
-  end
-  Note over CP,U: 默认 recall_delay_sec 后撤回提示消息
-```
+安装目录：`plugins/local/jmcomic_plugin/`。
 
 ---
 
