@@ -109,7 +109,8 @@ uv run ly --no-prompt
 
 | 包 | 用途 |
 |----|------|
-| `jmcomic>=2.6.0` | 站点搜索、相册下载、PDF 导出（**插件核心，必须装**） |
+| `jmcomic>=2.6.0` | 站点搜索、相册下载（**插件核心，必须装**） |
+| `img2pdf>=0.5.0` | jmcomic 内置 `img2pdf` 插件依赖，**导出 PDF / `#车牌` 必须装** |
 | `PyYAML>=6.0` | 读写 `data/jmcomic/config.yaml`（主项目通常已带 PyYAML，写上是为了独立 pip 安装时不缺依赖） |
 
 ### 常见错误
@@ -120,6 +121,7 @@ uv run ly --no-prompt
 | `No such file or directory: plugins/local/jmcomic_plugin/requirements.txt` | 当前不在项目根目录；先 `cd` 到含 `pyproject.toml` 的那一层 |
 | 插件列表没有 `jmcomic` | 确认 `plugins/local/jmcomic_plugin/` 存在且 `plugins.enabled: true`，然后重启 |
 | `ModuleNotFoundError: jmcomic` | 未执行第二步，或装到了别的 Python 环境；务必在根目录用 `uv pip install -r ...` |
+| 日志 `插件 img2pdf 依赖库: img2pdf` / `PDF export finished but output file was not found` | 未装 `img2pdf`；重新执行 `uv pip install -r plugins/local/jmcomic_plugin/requirements.txt` 后重启 |
 
 ---
 

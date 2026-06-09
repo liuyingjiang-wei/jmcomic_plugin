@@ -87,6 +87,17 @@ def pdf_result(
     }
 
 
+def ensure_pdf_export_deps() -> None:
+    """jmcomic Feature.export_pdf uses Img2pdfPlugin; without img2pdf it silently skips."""
+    try:
+        import img2pdf  # noqa: F401
+    except ImportError as exc:
+        raise RuntimeError(
+            "PDF 导出依赖 img2pdf 未安装。请在 LY-NEXT 项目根目录执行: "
+            "uv pip install -r plugins/local/jmcomic_plugin/requirements.txt"
+        ) from exc
+
+
 def build_option(download_dir: Path):
     import jmcomic
 
@@ -155,6 +166,8 @@ def download_album_sync(album_id: str) -> dict[str, Any]:
             logger.info("jmcomic album %s hit cached pdf: %s", album_text, existing.name)
             return pdf_result(existing, album_text, cached=True)
 
+    ensure_pdf_export_deps()
+
     from jmcomic import Feature, download_album
 
     option = build_option(download_dir)
@@ -173,7 +186,11 @@ def download_album_sync(album_id: str) -> dict[str, Any]:
 
     pdf_path = find_pdf(pdf_dir, album_text)
     if not pdf_path:
-        raise RuntimeError("PDF export finished but output file was not found")
+        raise RuntimeError(
+            f"PDF 导出失败：在 {pdf_dir} 未找到相册 {album_text} 的 PDF。"
+            " 若日志出现 img2pdf 依赖警告，请执行: "
+            "uv pip install -r plugins/local/jmcomic_plugin/requirements.txt"
+        )
 
     elapsed = round(time.time() - started, 2)
     logger.info("jmcomic album %s download done pdf=%s elapsed=%.2fs", album_text, pdf_path.name, elapsed)
