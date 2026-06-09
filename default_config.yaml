@@ -1,0 +1,13 @@
+download_dir: "data/jmcomic/download"
+pdf_dir: "data/jmcomic/pdf"
+delete_original: true
+reuse_existing_pdf: true
+client:
+  impl: "api"
+  proxy: ""
+  use_system_proxy: false
+public_base_url: ""
+qq:
+  chepai_enabled: true
+  recall_delay_sec: 120
+  download_timeout_sec: 600
