@@ -33,7 +33,6 @@
 
 安装目录：`plugins/local/jmcomic_plugin/`。
 
----
 
 ## 依赖与安装
 
